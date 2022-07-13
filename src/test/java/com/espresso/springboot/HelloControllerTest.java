@@ -40,13 +40,23 @@ public class HelloControllerTest {
     public void helloDto가리턴됨() throws  Exception{
         String name = "hello";
         int amount = 1000;
-        mvc.perform(
-                    get("/hello/dto")
-                                .param("name", name)
-                                .param("amount", String.valueOf(amount))
+        mvc.perform(get("/hello/dto")
+                        .param("name", name)
+                        .param("amount", String.valueOf(amount))
                     )
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name", is(name)))
                     .andExpect(jsonPath("$.amount",is(amount)));
+
+        mvc.perform(get("/showlog"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("hello,1000\n"));
+
+        mvc.perform(get("/clrlog"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+
+        mvc.perform(get("/clrloeg"))
+                .andExpect(status().isNotFound());
     }
 }
