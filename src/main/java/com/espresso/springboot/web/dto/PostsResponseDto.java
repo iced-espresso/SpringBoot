@@ -2,8 +2,10 @@ package com.espresso.springboot.web.dto;
 
 import com.espresso.springboot.domain.posts.Posts;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class PostsResponseDto {
     private Long id;
     private String title;

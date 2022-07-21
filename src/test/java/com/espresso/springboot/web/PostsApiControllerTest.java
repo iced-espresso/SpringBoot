@@ -2,7 +2,9 @@ package com.espresso.springboot.web;
 
 import com.espresso.springboot.domain.posts.Posts;
 import com.espresso.springboot.domain.posts.PostsRepository;
+import com.espresso.springboot.web.dto.PostsResponseDto;
 import com.espresso.springboot.web.dto.PostsSaveRequestDto;
+import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -62,5 +66,34 @@ public class PostsApiControllerTest {
                 .isEqualTo(title);
         assertThat(all.get(0).getContent())
                 .isEqualTo(content);
+    }
+
+    @Test
+    public void Posts_수정() throws Exception{
+        Posts savedPosts = postsRepository.save(Posts.builder().title("title").content("content").author("csu2018@gmail.com").build());
+        Long id = postsRepository.findAll().get(0).getId();
+
+        String update_title = "update_title";
+        String update_content = "update_content";
+        PostsUpdateRequestDto updateRequestDto = PostsUpdateRequestDto.builder()
+                .title(update_title)
+                .content(update_content)
+                .build();
+        String url = "http://localhost:" + port + "/api/v1/posts/" + id;
+        ResponseEntity<Long> updateResponseEntity = restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(updateRequestDto), Long.class);
+
+        assertThat(updateResponseEntity.getStatusCode())
+                .isEqualTo(HttpStatus.OK);
+        assertThat(updateResponseEntity.getBody())
+                .isGreaterThan(0L);
+
+        url = "http://localhost:" + port + "/api/v1/posts/get";
+        HttpEntity<Posts> longHttpEntity = new HttpEntity<>(savedPosts);
+//        ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url,PostsResponseDto.class);
+        ResponseEntity<PostsResponseDto> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
+                longHttpEntity, PostsResponseDto.class);
+        PostsResponseDto responseDto = responseEntity.getBody();
+        assertThat(responseDto.getTitle()).isEqualTo(update_title);
+        assertThat(responseDto.getContent()).isEqualTo(update_content);
     }
 }

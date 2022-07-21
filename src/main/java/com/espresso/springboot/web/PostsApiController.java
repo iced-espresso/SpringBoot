@@ -1,5 +1,6 @@
 package com.espresso.springboot.web;
 
+import com.espresso.springboot.domain.posts.Posts;
 import com.espresso.springboot.service.posts.PostsService;
 import com.espresso.springboot.web.dto.PostsResponseDto;
 import com.espresso.springboot.web.dto.PostsSaveRequestDto;
@@ -22,9 +23,10 @@ public class PostsApiController {
         return postsService.update(id, requestDto);
     }
 
-    @GetMapping("/api/v1/posts/{id}")
-    public PostsResponseDto findById (@PathVariable Long id){
-        return postsService.findById(id);
+    @GetMapping("/api/v1/posts/get")
+    public PostsResponseDto findById (@RequestBody Posts requestDto){
+        return postsService.findById(requestDto.getId());
     }
+
 
 }
