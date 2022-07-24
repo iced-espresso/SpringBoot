@@ -21,8 +21,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-@RunWith(SpringRunner.class)
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@RunWith(SpringRunner.class)
 public class PostsApiControllerTest {
 
     @LocalServerPort
@@ -134,4 +135,30 @@ public class PostsApiControllerTest {
         assertThat(postsResponseDto.getContent()).isEqualTo(content);
         assertThat(postsResponseDto.getAuthor()).isEqualTo(author);
     }
+
+    @Test
+    public void Posts_모자이크조회_PathVariable() throws Exception{
+        String title = "title";
+        String content ="testcontent2";
+        String author = "cseu";
+
+        postsRepository.save(Posts.builder().title(title).content(content).author(author).build());
+        Long id = postsRepository.findAll().get(0).getId();
+        String url = "http://localhost:" + port + "/api/v1/posts/get_mosaic/" + id;
+
+        ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url, PostsResponseDto.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        PostsResponseDto postsResponseDto = responseEntity.getBody();
+
+        assertThat(postsResponseDto.getTitle()).isEqualTo(title);
+        assertThat(postsResponseDto.getContent()).isEqualTo(content);
+        assertThat(postsResponseDto.getAuthor()).isEqualTo("c**u");
+
+    }
+
+    @Test
+    public void Posts_모든리스트조회_PathVariable() throws Exception{
+       // To - Do
+    }
+
 }

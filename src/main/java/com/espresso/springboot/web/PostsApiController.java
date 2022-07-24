@@ -32,5 +32,15 @@ public class PostsApiController {
         return postsService.findById(Long.parseLong(id));
     }
 
+    @GetMapping("/api/v1/posts/get_mosaic/{id}")
+    public PostsResponseDto findMosiacedById (@PathVariable String id) throws Exception{
+        return postsService.findById(Long.parseLong(id)).MosaicAuthor();
+    }
+
+    @GetMapping("/api/v1/posts/get_title/{id}")
+    public String findTitleById (@PathVariable String id) throws Exception{
+        return postsService.findById(Long.parseLong(id)).getTitle();
+    }
+
 
 }
