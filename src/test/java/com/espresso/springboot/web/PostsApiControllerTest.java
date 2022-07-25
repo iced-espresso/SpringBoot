@@ -177,6 +177,7 @@ public class PostsApiControllerTest {
         ResponseEntity<PostsResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsResponseDto[].class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         PostsResponseDto[] postsResponseDtoArray = responseEntity.getBody();
+        assertThat(postsResponseDtoArray.length).isEqualTo(postsArrayList.size());
 
         for(int i=0;i<5;i++)
         {

@@ -44,7 +44,7 @@ public class PostsApiController {
 
     @GetMapping("/api/v1/posts/get_all")
     public PostsResponseDto[] getAll () throws Exception{
-        return new PostsResponseDto[]{postsService.findById(0L)};
+        return postsService.findAll();
     }
 
 

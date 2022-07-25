@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class PostsService {
@@ -30,5 +33,17 @@ public class PostsService {
         Posts entity = postsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found posts. id = " + id));
         return new PostsResponseDto(entity);
+    }
+
+    public PostsResponseDto[] findAll(){
+        List<Posts> postsList = postsRepository.findAll();
+        List<PostsResponseDto> postsResponseDtos = new ArrayList<PostsResponseDto>();
+
+        for(Posts posts:postsList){
+            postsResponseDtos.add(new PostsResponseDto(posts));
+        }
+
+        return  postsResponseDtos.toArray(new PostsResponseDto[0]);
+
     }
 }
