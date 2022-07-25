@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -158,7 +159,33 @@ public class PostsApiControllerTest {
 
     @Test
     public void Posts_모든리스트조회_PathVariable() throws Exception{
-       // To - Do
+        String title = "title";
+        String content ="testcontent";
+        String author = "cseu";
+
+        ArrayList<Posts> postsArrayList = new ArrayList<Posts>();
+        for(int i=0;i<5;i++)
+        {
+            Posts posts = Posts.builder().title(title + Integer.toString(i)).content(content + Integer.toString(i)).author(author + Integer.toString(i))
+                    .build();
+            postsArrayList.add(posts);
+            postsRepository.save(posts);
+        }
+
+        String url = "http://localhost:" + port + "/api/v1/posts/get_all";
+
+        ResponseEntity<PostsResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsResponseDto[].class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        PostsResponseDto[] postsResponseDtoArray = responseEntity.getBody();
+
+        for(int i=0;i<5;i++)
+        {
+            PostsResponseDto postsResponseDto = postsResponseDtoArray[i];
+            assertThat(postsResponseDto.getTitle()).isEqualTo(postsArrayList.get(i).getTitle());
+            assertThat(postsResponseDto.getContent()).isEqualTo(postsArrayList.get(i).getContent());
+            assertThat(postsResponseDto.getAuthor()).isEqualTo(postsArrayList.get(i).getAuthor());
+        }
+
     }
 
 }
