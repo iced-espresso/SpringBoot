@@ -172,7 +172,7 @@ public class PostsApiControllerTest {
             postsRepository.save(posts);
         }
 
-        String url = "http://localhost:" + port + "/api/v1/posts/get_all";
+        String url = "http://localhost:" + port + "/api/v1/posts/get-all";
 
         ResponseEntity<PostsResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsResponseDto[].class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -186,7 +186,36 @@ public class PostsApiControllerTest {
             assertThat(postsResponseDto.getContent()).isEqualTo(postsArrayList.get(i).getContent());
             assertThat(postsResponseDto.getAuthor()).isEqualTo(postsArrayList.get(i).getAuthor());
         }
-
     }
 
+    @Test
+    public void Posts_모든리스트마스킹조회_PathVariable() throws Exception{
+        String title = "title";
+        String content ="testcontent";
+        String author = "cseu";
+
+        ArrayList<Posts> postsArrayList = new ArrayList<Posts>();
+        for(int i=0;i<5;i++)
+        {
+            Posts posts = Posts.builder().title(title + Integer.toString(i)).content(content + Integer.toString(i)).author(author + Integer.toString(i))
+                    .build();
+            postsArrayList.add(posts);
+            postsRepository.save(posts);
+        }
+
+        String url = "http://localhost:" + port + "/api/v1/posts/get-all-masking";
+
+        ResponseEntity<PostsResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsResponseDto[].class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        PostsResponseDto[] postsResponseDtoArray = responseEntity.getBody();
+        assertThat(postsResponseDtoArray.length).isEqualTo(postsArrayList.size());
+
+        for(int i=0;i<5;i++)
+        {
+            PostsResponseDto postsResponseDto = postsResponseDtoArray[i];
+            assertThat(postsResponseDto.getTitle()).isEqualTo(postsArrayList.get(i).getTitle());
+            assertThat(postsResponseDto.getContent()).isEqualTo(postsArrayList.get(i).getContent());
+            assertThat(postsResponseDto.getAuthor()).isEqualTo("c***" + Integer.toString(i));
+        }
+    }
 }

@@ -42,7 +42,7 @@ public class PostsApiController {
         return postsService.findById(Long.parseLong(id)).getTitle();
     }
 
-    @GetMapping("/api/v1/posts/get_all")
+    @GetMapping("/api/v1/posts/get-all")
     public PostsResponseDto[] getAll () throws Exception{
         return postsService.findAll();
     }
