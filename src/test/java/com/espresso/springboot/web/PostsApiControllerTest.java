@@ -145,7 +145,7 @@ public class PostsApiControllerTest {
 
         postsRepository.save(Posts.builder().title(title).content(content).author(author).build());
         Long id = postsRepository.findAll().get(0).getId();
-        String url = "http://localhost:" + port + "/api/v1/posts/get_mosaic/" + id;
+        String url = "http://localhost:" + port + "/api/v1/posts/get-masked/" + id;
 
         ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url, PostsResponseDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -154,7 +154,6 @@ public class PostsApiControllerTest {
         assertThat(postsResponseDto.getTitle()).isEqualTo(title);
         assertThat(postsResponseDto.getContent()).isEqualTo(content);
         assertThat(postsResponseDto.getAuthor()).isEqualTo("c**u");
-
     }
 
     @Test
@@ -192,12 +191,16 @@ public class PostsApiControllerTest {
     public void Posts_모든리스트마스킹조회_PathVariable() throws Exception{
         String title = "title";
         String content ="testcontent";
-        String author = "cseu";
+        String[] authors = {"a","ab","abc","abcd","aaaaa"};
+        String[] maskedAuthors = {"*", "a*", "a*c", "a**d", "a***a"};
 
         ArrayList<Posts> postsArrayList = new ArrayList<Posts>();
         for(int i=0;i<5;i++)
         {
-            Posts posts = Posts.builder().title(title + Integer.toString(i)).content(content + Integer.toString(i)).author(author + Integer.toString(i))
+            Posts posts = Posts.builder()
+                    .title(title + Integer.toString(i))
+                    .content(content + Integer.toString(i))
+                    .author(authors[i])
                     .build();
             postsArrayList.add(posts);
             postsRepository.save(posts);
@@ -215,7 +218,7 @@ public class PostsApiControllerTest {
             PostsResponseDto postsResponseDto = postsResponseDtoArray[i];
             assertThat(postsResponseDto.getTitle()).isEqualTo(postsArrayList.get(i).getTitle());
             assertThat(postsResponseDto.getContent()).isEqualTo(postsArrayList.get(i).getContent());
-            assertThat(postsResponseDto.getAuthor()).isEqualTo("c***" + Integer.toString(i));
+            assertThat(postsResponseDto.getAuthor()).isEqualTo(maskedAuthors[i]);
         }
     }
 }
