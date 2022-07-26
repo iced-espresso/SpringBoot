@@ -32,9 +32,9 @@ public class PostsApiController {
         return postsService.findById(Long.parseLong(id));
     }
 
-    @GetMapping("/api/v1/posts/get_mosaic/{id}")
-    public PostsResponseDto findMosiacedById (@PathVariable String id) throws Exception{
-        return postsService.findById(Long.parseLong(id)).MosaicAuthor();
+    @GetMapping("/api/v1/posts/get-masked/{id}")
+    public PostsResponseDto findById_MaskedAuthor (@PathVariable String id) throws Exception{
+        return postsService.findById(Long.parseLong(id)).MaskingAuthor();
     }
 
     @GetMapping("/api/v1/posts/get_title/{id}")
@@ -47,5 +47,13 @@ public class PostsApiController {
         return postsService.findAll();
     }
 
+    @GetMapping("/api/v1/posts/get-all-masking")
+    public PostsResponseDto[] getAll_Masking () throws Exception{
+        PostsResponseDto[] postsResponseDtos = postsService.findAll();
+        for(PostsResponseDto postsResponseDto:postsResponseDtos){
+            postsResponseDto.MaskingAuthor();
+        }
+        return postsResponseDtos;
+    }
 
 }
