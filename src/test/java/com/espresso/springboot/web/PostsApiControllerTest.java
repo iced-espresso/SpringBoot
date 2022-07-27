@@ -191,8 +191,8 @@ public class PostsApiControllerTest {
     public void Posts_모든리스트마스킹조회_PathVariable() throws Exception{
         String title = "title";
         String content ="testcontent";
-        String[] authors = {"a","ab","abc","abcd","aaaaa"};
-        String[] maskedAuthors = {"*", "a*", "a*c", "a**d", "a***a"};
+        String[] authors = {"a","ab","abc","abcd",""};
+        String[] maskedAuthors = {"*", "a*", "a*c", "a**d", ""};
 
         ArrayList<Posts> postsArrayList = new ArrayList<Posts>();
         for(int i=0;i<5;i++)

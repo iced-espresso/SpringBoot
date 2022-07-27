@@ -1,6 +1,7 @@
 package com.espresso.springboot.web.dto;
 
 import com.espresso.springboot.domain.posts.Posts;
+import com.espresso.springboot.utils.StringMasker;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,19 +27,10 @@ public class PostsResponseDto {
             return (0<i && i < len-1); // 3글자 이상일 경우, 중간 글자 마스킹
     }
     public PostsResponseDto MaskingAuthor(){
-        if (author.length() == 0){
+        if (author.isEmpty())
             return this;
-        }
 
-        StringBuilder mosaic_author = new StringBuilder(author);
-        for(int i=0;i<mosaic_author.length();i++)
-        {
-            if(_DoMasking(i,mosaic_author.length())){
-                mosaic_author.setCharAt(i, '*');
-            }
-        }
-
-        author = mosaic_author.toString();
+        author = new StringMasker(author).toString();
         return this;
     }
 }
