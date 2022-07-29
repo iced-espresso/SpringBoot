@@ -98,7 +98,26 @@ public class PostsApiControllerTest {
 //        assertThat(responseDto.getTitle()).isEqualTo(update_title);
 //        assertThat(responseDto.getContent()).isEqualTo(update_content);
     }
+    @Test
+    public void Posts_수정_Auditing() throws Exception{
+        Posts savedPosts = postsRepository.save(Posts.builder().title("title").content("content").author("csu2018@gmail.com").build());
+        Long id = postsRepository.findAll().get(0).getId();
 
+        String update_title = "update_title";
+        String update_content = "update_content";
+        PostsUpdateRequestDto updateRequestDto = PostsUpdateRequestDto.builder()
+                .title(update_title)
+                .content(update_content)
+                .build();
+        String url = "http://localhost:" + port + "/api/v1/posts/" + id;
+        ResponseEntity<Long> updateResponseEntity = restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(updateRequestDto), Long.class);
+
+        assertThat(updateResponseEntity.getStatusCode())
+                .isEqualTo(HttpStatus.OK);
+        assertThat(updateResponseEntity.getBody())
+                .isGreaterThan(0L);
+
+    }
     @Test
     public void Posts_조회_PathVariable() throws Exception{
         String title = "title";
