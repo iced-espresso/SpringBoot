@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,7 +57,6 @@ public class PostsRepositoryTest {
         List<Posts> postsList = postsRepository.findAll();
         Posts posts = postsList.get(0);
         System.out.println(">>>>> createdDate:" + posts.getCreatedDate() + " >>>>>> modifiedDate:" + posts.getModifiedDate());
-        Thread.sleep(1000);
         posts.update("t","c");
         System.out.println(">>>>> createdDate:" + posts.getCreatedDate() + " >>>>>> modifiedDate:" + posts.getModifiedDate());
         assertThat(posts.getCreatedDate()).isAfterOrEqualTo(now);
