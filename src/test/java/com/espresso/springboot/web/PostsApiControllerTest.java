@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,6 +102,8 @@ public class PostsApiControllerTest {
     @Test
     public void Posts_수정_Auditing() throws Exception{
         Posts savedPosts = postsRepository.save(Posts.builder().title("title").content("content").author("csu2018@gmail.com").build());
+
+
         Long id = postsRepository.findAll().get(0).getId();
 
         String update_title = "update_title";
@@ -114,9 +117,11 @@ public class PostsApiControllerTest {
 
         assertThat(updateResponseEntity.getStatusCode())
                 .isEqualTo(HttpStatus.OK);
-        assertThat(updateResponseEntity.getBody())
-                .isGreaterThan(0L);
 
+        LocalDateTime createdTime = postsRepository.findAll().get(0).getCreatedDate();
+        LocalDateTime modifiedTime = postsRepository.findAll().get(0).getModifiedDate();
+        System.out.println(">>>>> createdDate:" + createdTime + " >>>>>> modifiedDate:" + modifiedTime);
+        assertThat(modifiedTime).isAfter(createdTime);
     }
     @Test
     public void Posts_조회_PathVariable() throws Exception{

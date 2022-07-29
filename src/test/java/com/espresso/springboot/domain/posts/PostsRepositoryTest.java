@@ -1,5 +1,9 @@
 package com.espresso.springboot.domain.posts;
 
+import com.espresso.springboot.service.posts.PostsService;
+import com.espresso.springboot.web.dto.PostsResponseDto;
+import com.espresso.springboot.web.dto.PostsSaveRequestDto;
+import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,16 +52,10 @@ public class PostsRepositoryTest {
     public void BaseTimeEntity_등록() throws InterruptedException {
         //given
         LocalDateTime now = LocalDateTime.now();
-        postsRepository.save(Posts.builder()
-                .title("title")
-                .content("con")
-                .author("aut")
-                .build());
+        postsRepository.save(Posts.builder().content("c").title("t").author("a").build());
 
-        List<Posts> postsList = postsRepository.findAll();
-        Posts posts = postsList.get(0);
-        System.out.println(">>>>> createdDate:" + posts.getCreatedDate() + " >>>>>> modifiedDate:" + posts.getModifiedDate());
-        posts.update("t","c");
+
+        Posts posts = postsRepository.findAll().get(0);
         System.out.println(">>>>> createdDate:" + posts.getCreatedDate() + " >>>>>> modifiedDate:" + posts.getModifiedDate());
         assertThat(posts.getCreatedDate()).isAfterOrEqualTo(now);
         assertThat(posts.getModifiedDate()).isAfterOrEqualTo(now);
