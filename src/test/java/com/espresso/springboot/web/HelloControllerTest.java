@@ -1,4 +1,4 @@
-package com.espresso.springboot;
+package com.espresso.springboot.web;
 
 import com.espresso.springboot.web.HelloController;
 import org.junit.Test;
@@ -28,12 +28,7 @@ public class HelloControllerTest {
         mvc.perform(get("/hello"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(hello));
-        mvc.perform(get("/getword"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("1"));
 
-        MockHttpServletRequestBuilder s = get("/getword");
-        System.out.println(s);
     }
 
     @Test
@@ -47,16 +42,5 @@ public class HelloControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name", is(name)))
                     .andExpect(jsonPath("$.amount",is(amount)));
-
-        mvc.perform(get("/showlog"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("hello,1000\n"));
-
-        mvc.perform(get("/clrlog"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(""));
-
-        mvc.perform(get("/clrloeg"))
-                .andExpect(status().isNotFound());
     }
 }

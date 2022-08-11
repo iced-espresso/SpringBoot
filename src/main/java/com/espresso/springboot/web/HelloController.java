@@ -6,27 +6,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HelloController {
-    private int myword=0;
-    private String mylog = "";
-    @GetMapping("/getword")
-    public String getWord(){
-        return Integer.toString(myword);
+    @GetMapping("/hello")
+    public String hello() {
+        return "hello";
     }
-
-    @GetMapping("/showlog")
-    public String showLog(){
-        return mylog;
-    }
-
-    @GetMapping("/clrlog")
-    public void clearLog(){
-        mylog = "";
-    }
-
     @GetMapping("/hello/dto")
     public HelloResponseDto helloDto(@RequestParam("name") String name,
                                      @RequestParam("amount") String amount) {
-        mylog += name + ',' + amount + "\n";
         return new HelloResponseDto(name, Integer.parseInt(amount));
     }
 }

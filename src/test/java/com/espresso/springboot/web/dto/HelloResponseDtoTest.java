@@ -1,4 +1,4 @@
-package com.espresso.springboot.dto;
+package com.espresso.springboot.web.dto;
 
 import com.espresso.springboot.web.dto.HelloResponseDto;
 import org.junit.Test;
