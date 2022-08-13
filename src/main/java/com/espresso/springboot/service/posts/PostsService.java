@@ -2,6 +2,7 @@ package com.espresso.springboot.service.posts;
 
 import com.espresso.springboot.domain.posts.Posts;
 import com.espresso.springboot.domain.posts.PostsRepository;
+import com.espresso.springboot.web.dto.PostsListResponseDto;
 import com.espresso.springboot.web.dto.PostsResponseDto;
 import com.espresso.springboot.web.dto.PostsSaveRequestDto;
 import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -19,7 +21,7 @@ public class PostsService {
 
     @Transactional
     public Long save(PostsSaveRequestDto requestDto){
-        return postsRepository.save(requestDto.toEntity()).getId();
+         return postsRepository.save(requestDto.toEntity()).getId();
     }
 
     @Transactional
@@ -29,21 +31,35 @@ public class PostsService {
         return id;
     }
 
+    @Transactional(readOnly = true)
     public PostsResponseDto findById(Long id){
         Posts entity = postsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found posts. id = " + id));
         return new PostsResponseDto(entity);
     }
 
-    public PostsResponseDto[] findAll(){
-        List<Posts> postsList = postsRepository.findAll();
-        List<PostsResponseDto> postsResponseDtos = new ArrayList<PostsResponseDto>();
+    public PostsResponseDto findById_MaskedAuthor(Long id){
+        return findById(id).MaskingAuthor();
+    }
 
-        for(Posts posts:postsList){
-            postsResponseDtos.add(new PostsResponseDto(posts));
-        }
+    @Transactional(readOnly = true)
+    public List<PostsResponseDto> findAll(){
+        return  postsRepository.findAll().stream()
+                .map(PostsResponseDto::new)
+                .collect(Collectors.toList());
+    }
 
-        return  postsResponseDtos.toArray(new PostsResponseDto[0]);
+    @Transactional(readOnly = true)
+    public List<PostsListResponseDto> findAll_Masked(){
+        return  postsRepository.findAll().stream()
+                .map(posts -> new PostsListResponseDto(posts).MaskingAuthor().DropMilliSeconds())
+                .collect(Collectors.toList());
+    }
 
+    @Transactional(readOnly = true)
+    public List<PostsListResponseDto> findAllDesc(){
+        return postsRepository.findAllDesc().stream()
+                .map(PostsListResponseDto::new)
+                .collect(Collectors.toList());
     }
 }
