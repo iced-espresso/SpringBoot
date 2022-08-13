@@ -7,6 +7,7 @@ import com.espresso.springboot.web.dto.PostsResponseDto;
 import com.espresso.springboot.web.dto.PostsSaveRequestDto;
 import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,13 +53,13 @@ public class PostsService {
     @Transactional(readOnly = true)
     public List<PostsListResponseDto> findAll_Masked(){
         return  postsRepository.findAll().stream()
-                .map(posts -> new PostsListResponseDto(posts).MaskingAuthor().DropMilliSeconds())
+                .map(posts -> new PostsListResponseDto(posts).MaskingAuthor())
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<PostsListResponseDto> findAllDesc(){
-        return postsRepository.findAllDesc().stream()
+        return postsRepository.findAllDesc(PageRequest.of(0,10)).stream()
                 .map(PostsListResponseDto::new)
                 .collect(Collectors.toList());
     }

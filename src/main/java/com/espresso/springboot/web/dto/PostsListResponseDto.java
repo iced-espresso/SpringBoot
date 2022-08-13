@@ -24,8 +24,8 @@ public class PostsListResponseDto {
         this.title = entity.getTitle();
         this.author = entity.getAuthor();
         this.modifiedDate = entity.getModifiedDate();
-        this.formatedModifiedDate = modifiedDate.truncatedTo(ChronoUnit.SECONDS).toString();
-        this.formatedModifiedDate = this.formatedModifiedDate.replace('T',' ');
+        this.formatedModifiedDate = modifiedDate.truncatedTo(ChronoUnit.SECONDS).toString()
+                                                                                .replace('T', ' ');
     }
 
     public PostsListResponseDto MaskingAuthor(){
@@ -36,8 +36,8 @@ public class PostsListResponseDto {
         return this;
     }
 
-    public PostsListResponseDto DropMilliSeconds(){
-        modifiedDate = modifiedDate.truncatedTo(ChronoUnit.MILLIS);
+    public PostsListResponseDto truncatedToSeconds(){
+        modifiedDate = modifiedDate.truncatedTo(ChronoUnit.SECONDS);
         return this;
     }
 }

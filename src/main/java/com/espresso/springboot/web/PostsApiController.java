@@ -19,6 +19,9 @@ public class PostsApiController {
 
     @PostMapping("/api/v1/posts")
     public Long save(@RequestBody PostsSaveRequestDto requestDto){
+        if(requestDto.getAuthor().length() < 2){
+            throw new RuntimeException("author가 2글자 미만");
+        }
         return postsService.save(requestDto);
     }
 
