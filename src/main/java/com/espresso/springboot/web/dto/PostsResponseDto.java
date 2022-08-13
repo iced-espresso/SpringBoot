@@ -20,12 +20,6 @@ public class PostsResponseDto {
         this.author = entity.getAuthor();
     }
 
-    private Boolean _DoMasking(int i, int len){
-        if(len < 3)
-            return i == len-1; // 2글자 이하일 경우 마지막 글자 마스킹
-        else
-            return (0<i && i < len-1); // 3글자 이상일 경우, 중간 글자 마스킹
-    }
     public PostsResponseDto MaskingAuthor(){
         if (author.isEmpty())
             return this;

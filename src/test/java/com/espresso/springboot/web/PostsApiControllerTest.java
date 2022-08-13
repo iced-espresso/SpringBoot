@@ -2,6 +2,7 @@ package com.espresso.springboot.web;
 
 import com.espresso.springboot.domain.posts.Posts;
 import com.espresso.springboot.domain.posts.PostsRepository;
+import com.espresso.springboot.web.dto.PostsListResponseDto;
 import com.espresso.springboot.web.dto.PostsResponseDto;
 import com.espresso.springboot.web.dto.PostsSaveRequestDto;
 import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
@@ -131,7 +132,7 @@ public class PostsApiControllerTest {
 
         postsRepository.save(Posts.builder().title(title).content(content).author(author).build());
         Long id = postsRepository.findAll().get(0).getId();
-        String url = "http://localhost:" + port + "/api/v1/posts/get/" + id;
+        String url = "http://localhost:" + port + "/api/v1/posts/" + id;
 
         ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url, PostsResponseDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -150,7 +151,7 @@ public class PostsApiControllerTest {
 
         postsRepository.save(Posts.builder().title(title).content(content).author(author).build());
         Long id = postsRepository.findAll().get(0).getId();
-        String url = "http://localhost:" + port + "/api/v1/posts/get?id=" + id;
+        String url = "http://localhost:" + port + "/api/v1/posts?id=" + id;
 
         ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url, PostsResponseDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -169,7 +170,7 @@ public class PostsApiControllerTest {
 
         postsRepository.save(Posts.builder().title(title).content(content).author(author).build());
         Long id = postsRepository.findAll().get(0).getId();
-        String url = "http://localhost:" + port + "/api/v1/posts/get-masked/" + id;
+        String url = "http://localhost:" + port + "/api/v1/posts-masked/" + id;
 
         ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url, PostsResponseDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -195,7 +196,7 @@ public class PostsApiControllerTest {
             postsRepository.save(posts);
         }
 
-        String url = "http://localhost:" + port + "/api/v1/posts/get-all";
+        String url = "http://localhost:" + port + "/api/v1/posts-all";
 
         ResponseEntity<PostsResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsResponseDto[].class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -230,18 +231,17 @@ public class PostsApiControllerTest {
             postsRepository.save(posts);
         }
 
-        String url = "http://localhost:" + port + "/api/v1/posts/get-all-masking";
+        String url = "http://localhost:" + port + "/api/v1/posts-all-masking";
 
-        ResponseEntity<PostsResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsResponseDto[].class);
+        ResponseEntity<PostsListResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsListResponseDto[].class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        PostsResponseDto[] postsResponseDtoArray = responseEntity.getBody();
+        PostsListResponseDto[] postsResponseDtoArray = responseEntity.getBody();
         assertThat(postsResponseDtoArray.length).isEqualTo(postsArrayList.size());
 
         for(int i=0;i<5;i++)
         {
-            PostsResponseDto postsResponseDto = postsResponseDtoArray[i];
+            PostsListResponseDto postsResponseDto = postsResponseDtoArray[i];
             assertThat(postsResponseDto.getTitle()).isEqualTo(postsArrayList.get(i).getTitle());
-            assertThat(postsResponseDto.getContent()).isEqualTo(postsArrayList.get(i).getContent());
             assertThat(postsResponseDto.getAuthor()).isEqualTo(maskedAuthors[i]);
         }
     }
