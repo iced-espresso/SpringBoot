@@ -13,6 +13,10 @@ var main = {
                             _this.delete();
                         });
 
+        $('#btn-local-login').on('click', function () {
+                            _this.local_login();
+                        });
+
     },
     save : function () {
         var data = {
@@ -69,7 +73,27 @@ var main = {
             }).fail(function (error) {
                 alert(JSON.stringify(error));
             });
-        }
+    },
+
+    local_login : function () {
+                var data = {
+                    email: $('#email').val(),
+                    name: $('#userName').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/v1/local-login',
+                    dataType: 'json',
+                    contentType:'application/json; charset=utf-8',
+                    data: JSON.stringify(data)
+                }).done(function() {
+                    alert('로그인 완료');
+                    window.location.href = '/';
+                }).fail(function (error) {
+                    alert(JSON.stringify(error));
+                });
+        },
 }
 
 main.init();

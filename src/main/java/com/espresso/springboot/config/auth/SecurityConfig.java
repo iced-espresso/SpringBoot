@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.client.userinfo.CustomUserTypesOAuth2
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
     private final CustomOAuth2UserService customOAuth2UserService;
 
     @Override
@@ -18,15 +17,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .headers().frameOptions().disable()
                 .and()
-                    .authorizeRequests()
-                    .antMatchers("/", "/css/**", "/images/**", "/js/**").permitAll()
-                    .antMatchers("/api/v1/**").hasRole(Role.USER.name())
-                    .anyRequest().authenticated()
+                .authorizeRequests()
+                .antMatchers("/", "/css/**", "/images/**", "/js/**", "/local-login").permitAll()
+                .antMatchers("/api/v1/local-login").permitAll()
+                .antMatchers("/api/v1/**").hasRole(Role.USER.name())
+
+                .anyRequest().authenticated()
                 .and()
-                    .logout().logoutSuccessUrl("/")
+                .logout().logoutSuccessUrl("/")
                 .and()
-                    .oauth2Login()
-                        .userInfoEndpoint()
-                            .userService(customOAuth2UserService);
+                .formLogin()
+                .loginPage("/local-login")
+                .defaultSuccessUrl("/")
+                .permitAll()
+                .and()
+                .exceptionHandling().accessDeniedPage("/access-denied");
+//                .and()
+//                    .oauth2Login()
+//                        .userInfoEndpoint()
+//                            .userService(customOAuth2UserService);
     }
 }
