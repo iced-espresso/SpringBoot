@@ -3,8 +3,16 @@
     <div class="col-md-12">
         <div class="row">
             <div class="col-md-6">
-                <a href="/posts/save" role="button"
-                   class="btn btn-outline-primary">글 등록</a>
+                <a href="/posts/save" role="button" class="btn btn-outline-primary">글 등록</a>
+                {{#name}}
+                    name: <span id="user">{{name}}</span>
+                    login_time: <span id="login_time">{{loginTime}}</span>
+                    <a href="/logout" class="btn btn-info active" role="button">Logout</a>
+                {{/name}}
+                {{^name}}
+                    <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
+                    <a href="/local-login" class="btn btn-success active" role="button">Local Login</a>
+                {{/name}}
             </div>
         </div>
         <br>
