@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LocalLoginRequestDto {
     private String email;
-    private String name;
+    private String password;
 
     @Builder
-    public LocalLoginRequestDto(String email, String userName){
+    public LocalLoginRequestDto(String email, String password){
         this.email = email;
-        this.name = userName;
+        this.password = password;
     }
 
 }
