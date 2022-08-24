@@ -19,11 +19,12 @@ public class PostsSaveRequestDto {
         this.author = author;
     }
 
-    public Posts toEntity(){
+    public Posts toEntity(Long uid){
         return Posts.builder()
                 .title(title)
                 .content(content)
                 .author(author)
+                .uid(uid)
                 .build();
     }
 }
