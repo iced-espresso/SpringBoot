@@ -1,5 +1,6 @@
 package com.espresso.springboot.service.posts;
 
+import com.espresso.springboot.config.auth.dto.SessionUser;
 import com.espresso.springboot.domain.posts.Posts;
 import com.espresso.springboot.domain.posts.PostsRepository;
 import com.espresso.springboot.web.dto.PostsListResponseDto;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,15 +21,22 @@ import java.util.stream.Collectors;
 @Service
 public class PostsService {
     private final PostsRepository postsRepository;
+    private final HttpSession httpSession;
 
     @Transactional
     public Long save(PostsSaveRequestDto requestDto){
-         return postsRepository.save(requestDto.toEntity()).getId();
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if(sessionUser==null){
+            throw new IllegalArgumentException("로그인 해주십시오.");
+        }
+        Posts newPosts = requestDto.toEntity(sessionUser.getId());
+        return postsRepository.save(newPosts).getId();
     }
 
     @Transactional
     public Long update(Long id, PostsUpdateRequestDto requestDto) {
         Posts posts = postsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("not found posts. id =" + id));
+        validateUser(posts);
         posts.update(requestDto.getTitle(), requestDto.getContent());
         return id;
     }
@@ -68,7 +77,16 @@ public class PostsService {
     public void delete(Long id) {
         Posts posts = postsRepository.findById(id)
                 .orElseThrow(()->new IllegalArgumentException("게시글이 없습니다. id=" + id.toString()));
-        postsRepository.deleteById(id);
 
+        validateUser(posts);
+        postsRepository.deleteById(id);
+    }
+
+    private void validateUser(Posts posts) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if(!sessionUser.getEmail().equals("admin") &&
+                !sessionUser.getId().equals(posts.getUid())){
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
     }
 }
