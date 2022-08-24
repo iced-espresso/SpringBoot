@@ -16,6 +16,10 @@ var main = {
         $('#btn-local-login').on('click', function () {
                             _this.local_login();
                         });
+     $('#btn-change-user-info').on('click', function () {
+                                _this.change_user_info();
+                            });
+
 
     },
     save : function () {
@@ -78,7 +82,7 @@ var main = {
     local_login : function () {
                 var data = {
                     email: $('#email').val(),
-                    name: $('#userName').val()
+                    password: $('#password').val()
                 };
 
                 $.ajax({
@@ -93,7 +97,27 @@ var main = {
                 }).fail(function (error) {
                     alert(JSON.stringify(error));
                 });
-        },
+    },
+
+    change_user_info : function () {
+                var data = {
+                    name: $('#name').val(),
+                    password: $('#password').val()
+                };
+
+                $.ajax({
+                    type: 'PUT',
+                    url: 'api/v1/change-user-info',
+                    dataType: 'json',
+                    contentType:'application/json; charset=utf-8',
+                    data: JSON.stringify(data)
+                }).done(function() {
+                    alert('수정 완료');
+                    window.location.href = '/';
+                }).fail(function (error) {
+                    alert(JSON.stringify(error));
+                });
+    }
 }
 
 main.init();

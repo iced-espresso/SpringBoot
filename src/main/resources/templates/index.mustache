@@ -8,6 +8,7 @@
                     name: <span id="user">{{name}}</span>
                     login_time: <span id="login_time">{{loginTime}}</span>
                     <a href="/logout" class="btn btn-info active" role="button">Logout</a>
+                    <a href="/change-user-info" class="btn btn-success active" role="button">계정정보 변경</a>
                 {{/name}}
                 {{^name}}
                     <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
