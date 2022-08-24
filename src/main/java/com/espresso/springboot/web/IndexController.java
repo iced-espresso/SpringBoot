@@ -47,4 +47,17 @@ public class IndexController {
     public String localLogin(){
         return "local-login";
     }
+
+    @GetMapping("/change-user-info")
+    public String changePwd(Model model){
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null){
+            throw new IllegalArgumentException("로그인 해주세요");
+        }
+
+        model.addAttribute("email", sessionUser.getEmail());
+        model.addAttribute("name", sessionUser.getName());
+
+        return "change-user-info";
+    }
 }

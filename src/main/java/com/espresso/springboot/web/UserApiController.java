@@ -2,7 +2,7 @@ package com.espresso.springboot.web;
 
 import com.espresso.springboot.service.user.UserService;
 import com.espresso.springboot.web.dto.LocalLoginRequestDto;
-import com.espresso.springboot.web.dto.UserUpdateNameAndPwdRequestDto;
+import com.espresso.springboot.web.dto.UserNamePwdUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +23,8 @@ public class UserApiController {
     }
 
     @PutMapping("/api/v1/change-user-info")
-    public Long changeUserInfo(@RequestBody UserUpdateNameAndPwdRequestDto userUpdateNameAndPwdRequestDto){
-        userService.update(userUpdateNameAndPwdRequestDto);
+    public Long changeUserInfo(@RequestBody UserNamePwdUpdateRequestDto userNamePwdUpdateRequestDto){
+        userService.update(userNamePwdUpdateRequestDto);
         return 0L;
     }
 

@@ -4,7 +4,7 @@ import com.espresso.springboot.config.auth.dto.SessionUser;
 import com.espresso.springboot.domain.user.User;
 import com.espresso.springboot.domain.user.UserRepository;
 import com.espresso.springboot.web.dto.LocalLoginRequestDto;
-import com.espresso.springboot.web.dto.UserUpdateNameAndPwdRequestDto;
+import com.espresso.springboot.web.dto.UserNamePwdUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -64,7 +64,7 @@ public class UserService {
     }
 
     @Transactional
-    public void update(UserUpdateNameAndPwdRequestDto userUpdateNameAndPwdRequestDto){
+    public void update(UserNamePwdUpdateRequestDto userNamePwdUpdateRequestDto){
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if(sessionUser == null){
             throw new IllegalArgumentException("로그인 필요");
@@ -72,7 +72,7 @@ public class UserService {
 
         Optional<User> user = userRepository.findByEmail(sessionUser.getEmail());
         user.map(entity -> {
-                    entity.update(userUpdateNameAndPwdRequestDto.getName(), entity.getPicture(), passwordEncoder.encode(userUpdateNameAndPwdRequestDto.getPassword()));
+                    entity.update(userNamePwdUpdateRequestDto.getName(), entity.getPicture(), passwordEncoder.encode(userNamePwdUpdateRequestDto.getPassword()));
                     return entity;
                 }
                 ).orElseThrow(() -> new IllegalArgumentException("user를 찾을 수 없습니다."));
