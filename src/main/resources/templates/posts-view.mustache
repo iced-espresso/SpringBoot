@@ -1,0 +1,48 @@
+{{>layout/header}}
+<style>
+
+div.a {
+  word-wrap: normal;
+}
+
+div.b {
+  word-wrap: break-word;
+}
+</style>
+
+<!-- Page content-->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-7">
+            <!-- Post content-->
+            <article>
+                <!-- Post header-->
+                <header class="mb-5">
+                    <div class="board-hearder">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">{{post.title}}</h1>
+                        <!-- Post meta content-->
+
+
+                        ㅤ  <div class="text-muted fst-italic" style="float:right">by {{post.author}}</div>
+                        <hr>
+                        <button type="button" class="btn btn-link btn-sm" style="text-decoration:none; color:gray; clear: right; float:right" onclick="location.href='/posts/update/{{post.id}}'" >Edit</button>
+                        <button type="button" class="btn btn-link btn-sm" style="text-decoration:none; color:gray; float:right" id="btn-delete" >Delete</button>
+
+
+                    </div>
+                </header>
+
+                <!-- Post content-->
+                <section class="mb-5">
+                    <div class="text" style="word-wrap: break-word"> {{{post.content}}} </div>
+                    <hr>
+                </section>
+            </article>
+        </div>
+    </div>
+</div>
+<div class="invisible">
+    <input type="text" class="form-control" id="id" value="{{post.id}}" readonly>
+</div>
+{{>layout/footer}}

@@ -43,6 +43,12 @@ public class IndexController {
         return "posts-update";
     }
 
+    @GetMapping("/posts/view/{id}")
+    public String postsView(@PathVariable Long id, Model model){
+        model.addAttribute("post", postsService.findById(id));
+        return "posts-view";
+    }
+
     @GetMapping("/local-login")
     public String localLogin(){
         return "local-login";

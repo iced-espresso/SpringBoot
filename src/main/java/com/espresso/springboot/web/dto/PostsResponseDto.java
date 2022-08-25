@@ -16,7 +16,7 @@ public class PostsResponseDto {
     public PostsResponseDto(Posts entity){
         this.id = entity.getId();
         this.title = entity.getTitle();
-        this.content = entity.getContent();
+        this.content = entity.getContent().replace("\r\n", "<br>").replace("\n", "<br>");
         this.author = entity.getAuthor();
     }
 
