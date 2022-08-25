@@ -1,22 +1,7 @@
 {{>layout/header}}
-    <h1> 게시판 </h1>
-    <div class="col-md-12">
-        <div class="row">
-            <div class="col-md-6">
-                <a href="/posts/save" role="button" class="btn btn-outline-primary">글 등록</a>
-                {{#name}}
-                    name: <span id="user">{{name}}</span>
-                    login_time: <span id="login_time">{{loginTime}}</span>
-                    <a href="/logout" class="btn btn-info active" role="button">Logout</a>
-                    <a href="/change-user-info" class="btn btn-success active" role="button">계정정보 변경</a>
-                {{/name}}
-                {{^name}}
-                    <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
-                    <a href="/local-login" class="btn btn-success active" role="button">Local Login</a>
-                {{/name}}
-            </div>
-        </div>
-        <br>
+<div class="container">
+    <h1> List </h1>
+    <div class="col-md-">
         <!-- 목록 출력 영역 -->
         <table class="table table-horizontal table-borderd">
             <thead class="thead-strong">
@@ -31,12 +16,28 @@
             {{#posts}}
                 <tr>
                     <td>{{id}}</td>
-                    <td><a href="/posts/update/{{id}}">{{title}}</a></td>
+                    <td><a href="/posts/view/{{id}}">{{title}}</a></td>
                     <td>{{author}}</td>
                     <td>{{formatedModifiedDate}}</td>
                 </tr>
             {{/posts}}
             </tbody>
         </table>
+        <div class="row">
+            <div class="col-md-">
+                <a href="/posts/save" role="button" class="btn btn-outline-primary">글 등록</a>
+            </div>
+        </div>
+        {{#name}}
+            <div class="badge bg-primary text-wrap" style="width: 6rem;"> {{name}} </div>
+            <a href="/logout" class="btn btn-info active" role="button">Logout</a>
+            <a href="/change-user-info" class="btn btn-success active" role="button">계정정보 변경</a>
+        {{/name}}
+        {{^name}}
+            <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
+            <a href="/local-login" class="btn btn-success active" role="button">Local Login</a>
+        {{/name}}
+        <br>
     </div>
+</div>
 {{>layout/footer}}
