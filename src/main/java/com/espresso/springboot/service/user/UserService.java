@@ -1,9 +1,11 @@
 package com.espresso.springboot.service.user;
 
 import com.espresso.springboot.config.auth.dto.SessionUser;
+import com.espresso.springboot.domain.user.Role;
 import com.espresso.springboot.domain.user.User;
 import com.espresso.springboot.domain.user.UserRepository;
 import com.espresso.springboot.web.dto.LocalLoginRequestDto;
+import com.espresso.springboot.web.dto.LocalRegisterRequestDto;
 import com.espresso.springboot.web.dto.UserNamePwdUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final HttpSession httpSession;
     private final PasswordEncoder passwordEncoder;
+    private static final String defaultPicture = "https://lh3.googleusercontent.com/a/AItbvmne-PY_6Gkewr3ZjyAVKOolbrLFaF5H7Z7a6Ge1=s96-c";
 
     @Transactional(readOnly = true)
     private User findByEmailAndName(LocalLoginRequestDto localLoginRequestDto){
@@ -77,6 +80,21 @@ public class UserService {
                 }
                 ).orElseThrow(() -> new IllegalArgumentException("user를 찾을 수 없습니다."));
         httpSession.setAttribute("user", new SessionUser(user.get()));
+    }
+
+    @Transactional
+    public Long register(LocalRegisterRequestDto localRegisterRequestDto) {
+        userRepository.findByEmail(localRegisterRequestDto.getEmail()).ifPresent(
+                (entity) -> new IllegalArgumentException("존재하는 email입니다. " + entity.getEmail()));
+
+        User newUser = User.builder().name(localRegisterRequestDto.getName())
+                .email(localRegisterRequestDto.getEmail())
+                .picture(defaultPicture)
+                .role(Role.USER)
+                .password(passwordEncoder.encode(localRegisterRequestDto.getPassword()))
+                .build();
+
+        return userRepository.save(newUser).getId();
     }
 }
 
