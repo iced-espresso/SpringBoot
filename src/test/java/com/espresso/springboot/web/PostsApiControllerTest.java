@@ -1,32 +1,46 @@
 package com.espresso.springboot.web;
 
+import com.espresso.springboot.config.auth.dto.SessionUser;
 import com.espresso.springboot.domain.posts.Posts;
 import com.espresso.springboot.domain.posts.PostsRepository;
+import com.espresso.springboot.domain.user.Role;
+import com.espresso.springboot.domain.user.User;
 import com.espresso.springboot.web.dto.PostsListResponseDto;
 import com.espresso.springboot.web.dto.PostsResponseDto;
 import com.espresso.springboot.web.dto.PostsSaveRequestDto;
 import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
+@WithMockUser(roles="USER")
 public class PostsApiControllerTest {
 
     @LocalServerPort
@@ -38,10 +52,28 @@ public class PostsApiControllerTest {
     @Autowired
     private PostsRepository postsRepository;
 
+    @Autowired
+    private WebApplicationContext context;
+
+
+    private MockMvc mvc;
+    private MockHttpSession session;
+    @Before
+    public void setup() {
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+        session = new MockHttpSession();
+        User user = User.builder().role(Role.USER).email("admin").name("name").password("1").build();
+        SessionUser sessionUser = new SessionUser(user);
+        session.setAttribute("user", sessionUser);
+    }
     @After
     public void tearDown() throws Exception{
         postsRepository.deleteAll();
     }
+
 
     @Test
     public void Posts_등록() throws Exception{
@@ -57,19 +89,15 @@ public class PostsApiControllerTest {
         String url = "http://localhost:" + port + "api/v1/posts";
 
         //when
-        ResponseEntity<Long> responseEntity = restTemplate.postForEntity(url, requestDto, Long.class);
+        mvc.perform(post(url).session(session)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
 
         //then
-        assertThat(responseEntity.getStatusCode())
-                .isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody())
-                .isGreaterThan(0L);
-
         List<Posts> all = postsRepository.findAll();
-        assertThat(all.get(0).getTitle())
-                .isEqualTo(title);
-        assertThat(all.get(0).getContent())
-                .isEqualTo(content);
+        assertThat(all.get(0).getTitle()).isEqualTo(title);
+        assertThat(all.get(0).getContent()).isEqualTo(content);
     }
 
     @Test
@@ -84,21 +112,16 @@ public class PostsApiControllerTest {
                 .content(update_content)
                 .build();
         String url = "http://localhost:" + port + "/api/v1/posts/" + id;
-        ResponseEntity<Long> updateResponseEntity = restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(updateRequestDto), Long.class);
+        //when
+        mvc.perform(put(url).session(session)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(updateRequestDto)))
+                .andExpect(status().isOk());
 
-        assertThat(updateResponseEntity.getStatusCode())
-                .isEqualTo(HttpStatus.OK);
-        assertThat(updateResponseEntity.getBody())
-                .isGreaterThan(0L);
-
-
-        HttpEntity<Posts> longHttpEntity = new HttpEntity<>(savedPosts);
-//        ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url,PostsResponseDto.class);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
-                longHttpEntity, String.class);
-        String responseDto = responseEntity.getBody();
-//        assertThat(responseDto.getTitle()).isEqualTo(update_title);
-//        assertThat(responseDto.getContent()).isEqualTo(update_content);
+        //then
+        List<Posts> all = postsRepository.findAll();
+        assertThat(all.get(0).getTitle()).isEqualTo(update_title);
+        assertThat(all.get(0).getContent()).isEqualTo(update_content);
     }
     @Test
     public void Posts_수정_Auditing() throws Exception{
@@ -114,10 +137,11 @@ public class PostsApiControllerTest {
                 .content(update_content)
                 .build();
         String url = "http://localhost:" + port + "/api/v1/posts/" + id;
-        ResponseEntity<Long> updateResponseEntity = restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(updateRequestDto), Long.class);
+        mvc.perform(put(url).session(session)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(updateRequestDto)))
+                .andExpect(status().isOk());
 
-        assertThat(updateResponseEntity.getStatusCode())
-                .isEqualTo(HttpStatus.OK);
 
         LocalDateTime createdTime = postsRepository.findAll().get(0).getCreatedDate();
         LocalDateTime modifiedTime = postsRepository.findAll().get(0).getModifiedDate();
@@ -134,10 +158,12 @@ public class PostsApiControllerTest {
         Long id = postsRepository.findAll().get(0).getId();
         String url = "http://localhost:" + port + "/api/v1/posts/" + id;
 
-        ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url, PostsResponseDto.class);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        PostsResponseDto postsResponseDto = responseEntity.getBody();
 
+        MvcResult mvcResult = mvc.perform(get(url).session(session)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+        PostsResponseDto postsResponseDto = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
         assertThat(postsResponseDto.getTitle()).isEqualTo(title);
         assertThat(postsResponseDto.getContent()).isEqualTo(content);
         assertThat(postsResponseDto.getAuthor()).isEqualTo(author);
@@ -153,9 +179,11 @@ public class PostsApiControllerTest {
         Long id = postsRepository.findAll().get(0).getId();
         String url = "http://localhost:" + port + "/api/v1/posts?id=" + id;
 
-        ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url, PostsResponseDto.class);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        PostsResponseDto postsResponseDto = responseEntity.getBody();
+        MvcResult mvcResult = mvc.perform(get(url).session(session)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+        PostsResponseDto postsResponseDto = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
 
         assertThat(postsResponseDto.getTitle()).isEqualTo(title);
         assertThat(postsResponseDto.getContent()).isEqualTo(content);
@@ -172,9 +200,11 @@ public class PostsApiControllerTest {
         Long id = postsRepository.findAll().get(0).getId();
         String url = "http://localhost:" + port + "/api/v1/posts-masked/" + id;
 
-        ResponseEntity<PostsResponseDto> responseEntity = restTemplate.getForEntity(url, PostsResponseDto.class);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        PostsResponseDto postsResponseDto = responseEntity.getBody();
+        MvcResult mvcResult = mvc.perform(get(url).session(session)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+        PostsResponseDto postsResponseDto = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
 
         assertThat(postsResponseDto.getTitle()).isEqualTo(title);
         assertThat(postsResponseDto.getContent()).isEqualTo(content);
@@ -198,9 +228,12 @@ public class PostsApiControllerTest {
 
         String url = "http://localhost:" + port + "/api/v1/posts-all";
 
-        ResponseEntity<PostsResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsResponseDto[].class);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        PostsResponseDto[] postsResponseDtoArray = responseEntity.getBody();
+        MvcResult mvcResult = mvc.perform(get(url).session(session)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+        PostsResponseDto[] postsResponseDtoArray = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto[].class);
+
         assertThat(postsResponseDtoArray.length).isEqualTo(postsArrayList.size());
 
         for(int i=0;i<5;i++)
@@ -233,9 +266,12 @@ public class PostsApiControllerTest {
 
         String url = "http://localhost:" + port + "/api/v1/posts-all-masking";
 
-        ResponseEntity<PostsListResponseDto[]> responseEntity = restTemplate.getForEntity(url, PostsListResponseDto[].class);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        PostsListResponseDto[] postsResponseDtoArray = responseEntity.getBody();
+        MvcResult mvcResult = mvc.perform(get(url).session(session)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+        PostsListResponseDto[] postsResponseDtoArray = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsListResponseDto[].class);
+
         assertThat(postsResponseDtoArray.length).isEqualTo(postsArrayList.size());
 
         for(int i=0;i<5;i++)

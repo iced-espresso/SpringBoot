@@ -22,6 +22,6 @@ public class IndexControllerTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         String body = responseEntity.getBody();
-        assertThat(body).contains("스프링 부트로 시작하는 웹 서비스");
+        assertThat(body).contains("게시글");
     }
 }
