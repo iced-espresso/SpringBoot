@@ -54,6 +54,11 @@ public class IndexController {
         return "local-login";
     }
 
+    @GetMapping("/local-register")
+    public String localRegister(){
+        return "local-register";
+    }
+
     @GetMapping("/change-user-info")
     public String changePwd(Model model){
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");

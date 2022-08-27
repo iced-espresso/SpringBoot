@@ -16,11 +16,12 @@ var main = {
         $('#btn-local-login').on('click', function () {
                             _this.local_login();
                         });
-     $('#btn-change-user-info').on('click', function () {
-                                _this.change_user_info();
+         $('#btn-change-user-info').on('click', function () {
+                                    _this.change_user_info();
+                        });
+         $('#btn-local-register').on('click', function () {
+                             _this.local_register();
                             });
-
-
     },
     save : function () {
         var data = {
@@ -39,7 +40,8 @@ var main = {
             alert('글이 등록되었습니다.');
             window.location.href = '/';
         }).fail(function (error) {
-            alert(JSON.stringify(error));
+            var parsedMessage = error.responseJSON.error + ": " +error.responseJSON.message;
+           alert(parsedMessage);
         });
     },
     update : function () {
@@ -60,7 +62,8 @@ var main = {
                 alert('글이 수정되었습니다.');
                 window.location.href = '/';
             }).fail(function (error) {
-                alert(JSON.stringify(error));
+                var parsedMessage = error.responseJSON.error + ": " +error.responseJSON.message;
+               alert(parsedMessage);
             });
     },
 
@@ -75,7 +78,8 @@ var main = {
                 alert('글이 삭제되었습니다.');
                 window.location.href = '/';
             }).fail(function (error) {
-                alert(JSON.stringify(error));
+                var parsedMessage = error.responseJSON.error + ": " +error.responseJSON.message;
+               alert(parsedMessage);
             });
     },
 
@@ -95,7 +99,8 @@ var main = {
                     alert('로그인 완료');
                     window.location.href = '/';
                 }).fail(function (error) {
-                    alert(JSON.stringify(error));
+                   var parsedMessage = error.responseJSON.error + ": " +error.responseJSON.message;
+                   alert(parsedMessage);
                 });
     },
 
@@ -115,7 +120,30 @@ var main = {
                     alert('수정 완료');
                     window.location.href = '/';
                 }).fail(function (error) {
-                    alert(JSON.stringify(error));
+                    var parsedMessage = error.responseJSON.error + ": " +error.responseJSON.message;
+                    alert(parsedMessage);
+                });
+    },
+
+    local_register : function () {
+                var data = {
+                    name: $('#name').val(),
+                    email: $('#email').val(),
+                    password: $('#password').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'api/v1/local-register',
+                    dataType: 'json',
+                    contentType:'application/json; charset=utf-8',
+                    data: JSON.stringify(data)
+                }).done(function() {
+                    alert('등록 완료');
+                    window.location.href = '/';
+                }).fail(function (error) {
+                    var parsedMessage = error.responseJSON.error + ": " +error.responseJSON.message;
+                    alert(parsedMessage);
                 });
     }
 }
