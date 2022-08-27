@@ -10,6 +10,7 @@ import com.espresso.springboot.web.dto.PostsResponseDto;
 import com.espresso.springboot.web.dto.PostsSaveRequestDto;
 import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.xmlunit.util.Mapper;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
@@ -58,6 +60,7 @@ public class PostsApiControllerTest {
 
     private MockMvc mvc;
     private MockHttpSession session;
+    private ObjectMapper mapper;
     @Before
     public void setup() {
         mvc = MockMvcBuilders
@@ -68,6 +71,9 @@ public class PostsApiControllerTest {
         User user = User.builder().role(Role.USER).email("admin").name("name").password("1").build();
         SessionUser sessionUser = new SessionUser(user);
         session.setAttribute("user", sessionUser);
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
     }
     @After
     public void tearDown() throws Exception{
@@ -91,7 +97,7 @@ public class PostsApiControllerTest {
         //when
         mvc.perform(post(url).session(session)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                        .content(mapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk());
 
         //then
@@ -115,7 +121,7 @@ public class PostsApiControllerTest {
         //when
         mvc.perform(put(url).session(session)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(new ObjectMapper().writeValueAsString(updateRequestDto)))
+                        .content(mapper.writeValueAsString(updateRequestDto)))
                 .andExpect(status().isOk());
 
         //then
@@ -139,7 +145,7 @@ public class PostsApiControllerTest {
         String url = "http://localhost:" + port + "/api/v1/posts/" + id;
         mvc.perform(put(url).session(session)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(new ObjectMapper().writeValueAsString(updateRequestDto)))
+                        .content(mapper.writeValueAsString(updateRequestDto)))
                 .andExpect(status().isOk());
 
 
@@ -163,7 +169,7 @@ public class PostsApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn();
-        PostsResponseDto postsResponseDto = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
+        PostsResponseDto postsResponseDto = mapper.readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
         assertThat(postsResponseDto.getTitle()).isEqualTo(title);
         assertThat(postsResponseDto.getContent()).isEqualTo(content);
         assertThat(postsResponseDto.getAuthor()).isEqualTo(author);
@@ -183,7 +189,7 @@ public class PostsApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn();
-        PostsResponseDto postsResponseDto = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
+        PostsResponseDto postsResponseDto = mapper.readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
 
         assertThat(postsResponseDto.getTitle()).isEqualTo(title);
         assertThat(postsResponseDto.getContent()).isEqualTo(content);
@@ -204,7 +210,7 @@ public class PostsApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn();
-        PostsResponseDto postsResponseDto = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
+        PostsResponseDto postsResponseDto = mapper.readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto.class);
 
         assertThat(postsResponseDto.getTitle()).isEqualTo(title);
         assertThat(postsResponseDto.getContent()).isEqualTo(content);
@@ -232,7 +238,7 @@ public class PostsApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn();
-        PostsResponseDto[] postsResponseDtoArray = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto[].class);
+        PostsResponseDto[] postsResponseDtoArray = mapper.readValue(mvcResult.getResponse().getContentAsString(), PostsResponseDto[].class);
 
         assertThat(postsResponseDtoArray.length).isEqualTo(postsArrayList.size());
 
@@ -270,7 +276,7 @@ public class PostsApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn();
-        PostsListResponseDto[] postsResponseDtoArray = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), PostsListResponseDto[].class);
+        PostsListResponseDto[] postsResponseDtoArray = mapper.readValue(mvcResult.getResponse().getContentAsString(), PostsListResponseDto[].class);
 
         assertThat(postsResponseDtoArray.length).isEqualTo(postsArrayList.size());
 

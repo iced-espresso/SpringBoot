@@ -85,7 +85,10 @@ public class UserService {
     @Transactional
     public Long register(LocalRegisterRequestDto localRegisterRequestDto) {
         userRepository.findByEmail(localRegisterRequestDto.getEmail()).ifPresent(
-                (entity) -> new IllegalArgumentException("존재하는 email입니다. " + entity.getEmail()));
+                entity -> {
+                    throw new IllegalArgumentException("이미 존재하는 회원입니다.");
+                });
+
 
         User newUser = User.builder().name(localRegisterRequestDto.getName())
                 .email(localRegisterRequestDto.getEmail())
