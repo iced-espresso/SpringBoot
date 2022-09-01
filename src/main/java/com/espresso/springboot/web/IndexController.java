@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
@@ -19,16 +20,33 @@ public class IndexController {
     @GetMapping("/")
     public String index(Model model){
         model.addAttribute("posts", postsService.findAllDesc());
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser != null){
-            model.addAttribute("name", sessionUser.getName());
-            model.addAttribute("loginTime", sessionUser.getLocalDateTime());
-        }
+        Optional<SessionUser> sessionUser = Optional.ofNullable((SessionUser)httpSession.getAttribute("user"));
+        sessionUser.ifPresent(user -> {
+                model.addAttribute("name", user.getName());
+                model.addAttribute("loginTime", user.getLocalDateTime());
+        });
+
+        return "index";
+    }
+
+    @GetMapping("/posts/my")
+    public String myPosts(Model model) {
+        Optional<SessionUser> sessionUser = Optional.ofNullable((SessionUser)httpSession.getAttribute("user"));
+        sessionUser.ifPresent(user -> {
+            model.addAttribute("name", user.getName());
+            model.addAttribute("loginTime", user.getLocalDateTime());
+            model.addAttribute("posts", postsService.findByUid(user.getId()));
+        });
+
         return "index";
     }
 
     @GetMapping("/posts/save")
-    public String postsSave(){
+    public String postsSave(Model model){
+        Optional<SessionUser> sessionUser = Optional.ofNullable((SessionUser)httpSession.getAttribute("user"));
+        sessionUser.ifPresent(user -> {
+            model.addAttribute("name", user.getName());
+        });
         return "posts-save";
     }
 

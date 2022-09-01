@@ -73,6 +73,13 @@ public class PostsService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<PostsListResponseDto> findByUid(Long uid){
+        return postsRepository.findByUid(uid, PageRequest.of(0,10)).stream()
+                .map( entity -> new PostsListResponseDto(entity))
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void delete(Long id) {
         Posts posts = postsRepository.findById(id)
@@ -88,5 +95,12 @@ public class PostsService {
                 !sessionUser.getId().equals(posts.getUid())){
             throw new IllegalArgumentException("권한이 없습니다.");
         }
+    }
+
+    public Boolean validateEdit(Long id) {
+        Posts posts = postsRepository.findById(id)
+                .orElseThrow(()->new IllegalArgumentException("게시글이 없습니다. id=" + id.toString()));
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        return sessionUser.getId().equals(posts.getUid());
     }
 }
