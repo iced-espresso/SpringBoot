@@ -8,6 +8,7 @@ import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class PostsApiController {
         return postsService.findById_MaskedAuthor(Long.parseLong(id));
     }
 
-    @GetMapping("/api/v1/posts_title/{id}")
+    @GetMapping("/api/v1/posts-title/{id}")
     public String findTitleById (@PathVariable String id) throws Exception{
         return postsService.findById(Long.parseLong(id)).getTitle();
     }
@@ -63,6 +64,11 @@ public class PostsApiController {
     @GetMapping("/api/v1/posts-all-masking")
     public List<PostsListResponseDto> getAll_Masking() throws Exception{
         return postsService.findAll_Masked();
+    }
+
+    @GetMapping("/api/v1/validate-edit")
+    public Boolean validateEdit(@RequestParam Long id){
+        return postsService.validateEdit(id);
     }
 
 }

@@ -32,7 +32,7 @@ public class UserService {
     private static final String defaultPicture = "https://lh3.googleusercontent.com/a/AItbvmne-PY_6Gkewr3ZjyAVKOolbrLFaF5H7Z7a6Ge1=s96-c";
 
     @Transactional(readOnly = true)
-    private User findByEmailAndName(LocalLoginRequestDto localLoginRequestDto){
+    private User findByEmail(LocalLoginRequestDto localLoginRequestDto){
         Optional<User> optionalUser = userRepository.findByEmail(localLoginRequestDto.getEmail());
         optionalUser.orElseThrow(() -> new IllegalArgumentException("email이 없습니다."));
         return optionalUser.get();
@@ -40,7 +40,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Long login(LocalLoginRequestDto localLoginRequestDto){
-        User user = findByEmailAndName(localLoginRequestDto);
+        User user = findByEmail(localLoginRequestDto);
         if(!passwordEncoder.matches(localLoginRequestDto.getPassword(), user.getPassword())){
             throw new IllegalArgumentException("password가 일치하지 않습니다.");
         }

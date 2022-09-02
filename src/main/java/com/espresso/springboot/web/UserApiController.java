@@ -16,6 +16,7 @@ public class UserApiController {
     public Long register(@RequestBody LocalRegisterRequestDto localRegisterRequestDto){
         return userService.register(localRegisterRequestDto);
     }
+
     @PostMapping("/api/v1/local-login")
     public Long login(@RequestBody LocalLoginRequestDto localLoginRequestDto){
         return userService.login(localLoginRequestDto);

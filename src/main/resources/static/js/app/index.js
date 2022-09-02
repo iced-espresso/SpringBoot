@@ -22,6 +22,10 @@ var main = {
          $('#btn-local-register').on('click', function () {
                              _this.local_register();
                             });
+
+         $('#btn-goto-edit').on('click', function () {
+                             _this.goto_edit();
+                            });
     },
     save : function () {
         var data = {
@@ -145,7 +149,28 @@ var main = {
                     var parsedMessage = error.responseJSON.error + ": " +error.responseJSON.message;
                     alert(parsedMessage);
                 });
-    }
+    },
+
+    goto_edit : function () {
+             var data = {
+                 id: $('#id').val(),
+             };
+
+             $.ajax({
+                 type: 'GET',
+                 url: '/api/v1/validate-edit?id=' + $('#id').val(),
+                 dataType: 'json',
+                 contentType:'application/json; charset=utf-8',
+             }).done(function(responseJSON) {
+                if(responseJSON)
+                    window.location.href = '/posts/update/' + data.id;
+                else
+                    alert("내가 작성한 글이 아닙니다.");
+             }).fail(function (error) {
+                 var parsedMessage = error.responseJSON.error + ": " +error.responseJSON.message;
+                 alert(parsedMessage);
+             });
+         }
 }
 
 main.init();
