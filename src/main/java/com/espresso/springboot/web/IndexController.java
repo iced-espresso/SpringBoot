@@ -2,6 +2,7 @@ package com.espresso.springboot.web;
 
 import com.espresso.springboot.config.auth.dto.SessionUser;
 import com.espresso.springboot.service.posts.PostsService;
+import com.espresso.springboot.utils.ServerCounter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,9 +18,11 @@ public class IndexController {
 
     private final PostsService postsService;
     private final HttpSession httpSession;
+    private final ServerCounter serverCounter;
     @GetMapping("/")
     public String index(Model model){
         model.addAttribute("posts", postsService.findAllDesc());
+        model.addAttribute("serverTestCount", serverCounter.getDummyCount());
         Optional<SessionUser> sessionUser = Optional.ofNullable((SessionUser)httpSession.getAttribute("user"));
         sessionUser.ifPresent(user -> {
                 model.addAttribute("name", user.getName());
