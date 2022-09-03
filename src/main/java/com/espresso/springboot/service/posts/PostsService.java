@@ -9,12 +9,16 @@ import com.espresso.springboot.web.dto.PostsSaveRequestDto;
 import com.espresso.springboot.web.dto.PostsUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -102,5 +106,24 @@ public class PostsService {
                 .orElseThrow(()->new IllegalArgumentException("게시글이 없습니다. id=" + id.toString()));
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         return sessionUser.getId().equals(posts.getUid());
+    }
+
+    @Async
+    @Scheduled(fixedRate=20000)
+    public void makeServerPosts(){
+        final Long adminUid = -1L;
+
+        Optional<Posts> lastPosts = postsRepository.findTopByOrderByModifiedDateDesc();
+        if(!lastPosts.isPresent() || !lastPosts.get().getUid().equals(adminUid)){
+            postsRepository.save(
+                    Posts.builder()
+                            .title("server make")
+                            .author("server")
+                            .content("dummy")
+                            .uid(-1L)
+                            .build()
+            );
+        }
+
     }
 }
